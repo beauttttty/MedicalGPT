@@ -1,0 +1,21 @@
+{
+  "base_model": "Qwen/Qwen3.5-0.8B",
+  "lora_model": null,
+  "tokenizer_path": "Qwen/Qwen3.5-0.8B",
+  "input_file": "notes/day2/eval/smoke_prompts.jsonl",
+  "output_file": "notes/day2/e0_base/smoke_predictions.jsonl",
+  "generation_config": {
+    "system_prompt": "你是一个医疗助手。",
+    "temperature": 0.0,
+    "do_sample": false,
+    "max_new_tokens": 512,
+    "repetition_penalty": 1.0,
+    "eval_batch_size": 1,
+    "seed": 42
+  },
+  "environment": {
+    "torch": "2.14.0+cu130",
+    "transformers": "5.17.0"
+  },
+  "created_at": "2026-10-13T00:49:59+08:00"
+}

@@ -169,9 +169,9 @@ def main():
             bnb_4bit_compute_dtype=load_type,
         )
     #加载基础模型
-    base_model = AutoModelForCausalLM.from_pretrained(args.base_model, **config_kwargs)
+    base_model = AutoModelForCausalLM.from_pretrained(args.base_model, **config_kwargs)#base_model 是一个继承自 nn.Module 的 PyTorch 模型对象，表示一个因果语言模型（Causal Language Model），它可以用于生成文本。from_pretrained() 方法会从指定的路径或模型名称加载预训练模型的权重和配置，并返回一个模型实例。
     try:
-        base_model.generation_config = GenerationConfig.from_pretrained(args.base_model, trust_remote_code=True)
+        base_model.generation_config = GenerationConfig.from_pretrained(args.base_model, trust_remote_code=True)# base_model.generation_config 是一个 GenerationConfig 对象，包含了模型生成文本时的各种参数和配置，例如最大生成长度、温度、重复惩罚等。from_pretrained() 方法会从指定的路径或模型名称加载预训练模型的生成配置，并返回一个 GenerationConfig 实例。
     except OSError:
         print("Failed to load generation config, using default.")
     #这里尝试从模型目录加载 generation_config.json。如果找不到文件并产生 OSError，就保留默认生成配置

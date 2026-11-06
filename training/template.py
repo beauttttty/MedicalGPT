@@ -10,8 +10,8 @@ from typing import Optional, List, Dict, Sequence
 __all__ = ['Conversation', 'register_conv_template', 'get_conv_template']
 
 
-@dataclass
-class Conversation:
+@dataclass#自己构造初始化函数
+class Conversation:#描述模型完整对话格式
     """A class that manages prompt templates and keeps all conversation history."""
 
     # The name of this template
@@ -29,16 +29,16 @@ class Conversation:
     # Stop token, default is tokenizer.eos_token
     stop_str: Optional[str] = "</s>"
 
-    def get_prompt(
+    def get_prompt(#从这里传入问题和答案
             self,
             messages: Optional[List[Sequence[str]]] = None,
-            system_prompt: Optional[str] = ""
+            system_prompt: Optional[str] = ""# 系统提示词
     ) -> str:
         """
         Returns a string containing prompt without response.
         """
         return "".join(self._format_example(messages, system_prompt))
-
+#把所有片段进行拼接成一个完整字符串，适合需要完整 prompt 的场景，推理，这个推理指的是模型生成回答的过程
     def get_dialog(
             self,
             messages: Optional[List[Sequence[str]]] = None,
@@ -48,6 +48,7 @@ class Conversation:
         Returns a list containing 2 * n elements where the 2k-th is a query and the (2k+1)-th is a response.
         """
         return self._format_example(messages, system_prompt)
+    #不执行join()，保留分段结果，适合sft
 
     def _format_example(
             self,
@@ -55,8 +56,8 @@ class Conversation:
             system_prompt: Optional[str] = ""
     ) -> List[str]:
         system_prompt = system_prompt or self.system_prompt
-        system_prompt = system_prompt + self.sep if system_prompt else ""  # add separator for non-empty system prompt
-        messages = messages or self.messages
+        system_prompt = system_prompt + self.sep if system_prompt else ""  # 系统提示词后加分隔符+add separator for non-empty system prompt
+        messages = messages or self.messages#[user_query, bot_resp]
         convs = []
         if not messages:
             messages = []
@@ -68,15 +69,21 @@ class Conversation:
                 convs.append(self.sep + self.prompt.format(query=user_query))
                 convs.append(bot_resp)
         return convs
-
+#只有第一轮加系统提示词，之后的轮次只加分隔符+only add system prompt for the first turn, and only add separator for the following turns
     def append_message(self, query: str, answer: str):
         """Append a new message."""
         self.messages.append([query, answer])
 
 
 # A global registry for all conversation templates
-conv_templates: Dict[str, Conversation] = {}
-
+conv_templates: Dict[str, Conversation] = {}#全局模板字典，存储所有注册的对话模板，模板名称 → Conversation对象
+"""
+{
+    "qwen": Conversation(...),
+    "qwen3": Conversation(...),
+    "qwen3_5": Conversation(...),
+}
+"""
 
 def register_conv_template(template: Conversation):
     """Register a new conversation template."""

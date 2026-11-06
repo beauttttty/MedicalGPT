@@ -228,7 +228,7 @@ class SavePeftModelTrainer(Trainer):
     def save_model(self, output_dir=None, _internal_call=False):
         """Save the LoRA model."""
         os.makedirs(output_dir, exist_ok=True)
-        torch.save(self.args, os.path.join(output_dir, TRAINING_ARGS_NAME))
+        torch.save(self.args, os.path.join(output_dir, TRAINING_ARGS_NAME))#保存训练参数
         self.model.save_pretrained(output_dir)
 
 
@@ -280,7 +280,7 @@ def find_all_linear_names(peft_model, int4=False, int8=False):
         elif int8:
             cls = bnb.nn.Linear8bitLt
     lora_module_names = set()
-    for name, module in peft_model.named_modules():
+    for name, module in peft_model.named_modules():#peft_model指的是LoRA模型，遍历所有模块    
         if isinstance(module, cls):
             # last layer is not add to lora_module_names
             if 'lm_head' in name:
@@ -289,8 +289,7 @@ def find_all_linear_names(peft_model, int4=False, int8=False):
                 continue
             names = name.split('.')
             lora_module_names.add(names[0] if len(names) == 1 else names[-1])
-    return sorted(lora_module_names)
-
+    return sorted(lora_module_names)#sorted()对lora_module_names进行排序
 
 def check_and_optimize_memory():
     """检查并优化GPU内存使用"""
@@ -332,14 +331,14 @@ def main():
     parser = HfArgumentParser((ModelArguments, DataArguments, Seq2SeqTrainingArguments, ScriptArguments))
 
     # 使用 parse_args_into_dataclasses 时忽略未知参数
-    if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
+    if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):#sys.argv[1]是一个JSON文件路径,sys.argv代表的意思是命令行参数列表,sys.argv[0]是脚本名称,sys.argv[1]是第一个参数,这里判断是否是JSON文件
         # 如果我们传递了一个 JSON 文件，让我们用它来配置参数
         model_args, data_args, training_args, script_args = parser.parse_json_file(
             json_file=os.path.abspath(sys.argv[1]))
     else:
         # 否则解析命令行参数，忽略未知参数
-        model_args, data_args, training_args, script_args = parser.parse_args_into_dataclasses(look_for_args_file=False)
-
+        model_args, data_args, training_args, script_args = parser.parse_args_into_dataclasses(look_for_args_file=False)#parser.parse_args_into_dataclasses的意思是将命令行参数解析为数据类实例,look_for_args_file=False表示不查找额外的参数文件
+#dataclass又指的是一个装饰器,它可以自动生成一些特殊方法,比如__init__()和__repr__(),从而简化类的定义.在这里,ModelArguments,DataArguments,Seq2SeqTrainingArguments和ScriptArguments都是数据类,用于存储模型参数、数据参数、训练参数和脚本参数.
     # 确保 DeepSpeed 配置正确加载
     if training_args.deepspeed is not None:
         training_args.distributed_state.deepspeed_plugin = None
@@ -425,6 +424,22 @@ def main():
             logger.info(f"eval files: {eval_data_files}")
             data_files["validation"] = eval_data_files
         raw_datasets = load_local_json_datasets(data_files, cache_dir=model_args.cache_dir)
+        """#多个jsonl文件加载为一个数据集,load_local_json_datasets是自定义函数,用于合并本地jsonl数据集
+        输入：data_files = {
+        "train": [
+            "medical_sft_1K_format.jsonl",
+            "glaive_toolcall_zh_demo.jsonl",
+        ],
+        "validation": [
+            "validation.jsonl",
+        ],
+        },
+        返回：DatasetDict({
+        "train": Dataset(...),
+        "validation": Dataset(...),
+            })
+
+        """
         # If no validation data is there, validation_split_percentage will be used to divide the dataset.
         if "validation" not in raw_datasets.keys():
             shuffled_train_dataset = raw_datasets["train"].shuffle(seed=42)
@@ -517,9 +532,9 @@ def main():
 
                 if not system_prompt:
                     system_prompt = system_prompts[i] if system_prompts else ""
-                if prompt_template:
+                if prompt_template:#指定对话模板
                     yield prompt_template.get_dialog(history_messages, system_prompt=system_prompt)
-                else:
+                else:#如果没有就是用tokenizer自带的模板
                     convs = []
                     accumulated = []
                     if system_prompt:
@@ -541,9 +556,9 @@ def main():
         for dialog in get_dialog(examples):
             input_ids, labels = [], []
 
-            for i in range(len(dialog) // 2):
+            for i in range(len(dialog) // 2):#多轮对话
                 source_ids = tokenizer.encode(text=dialog[2 * i], add_special_tokens=(i == 0))
-                target_ids = tokenizer.encode(text=dialog[2 * i + 1], add_special_tokens=False)
+                target_ids = tokenizer.encode(text=dialog[2 * i + 1], add_special_tokens=False)#不自动添加特殊 token，因为代码会自己补 EOS
 
                 total_len = len(source_ids) + len(target_ids)
                 max_source_len = int(max_length * (len(source_ids) / total_len))
@@ -560,7 +575,7 @@ def main():
                 if len(input_ids) + len(source_ids) + len(target_ids) + 1 > max_length:
                     break
 
-                input_ids += source_ids + target_ids + [tokenizer.eos_token_id]  # add eos token for each turn
+                input_ids += source_ids + target_ids + [tokenizer.eos_token_id]  # add eos token for each turn拼接完整输入
                 if script_args.train_on_inputs:
                     labels += source_ids + target_ids + [tokenizer.eos_token_id]
                 else:
@@ -578,7 +593,7 @@ def main():
 
     def filter_empty_labels(example):
         """Remove empty labels dataset."""
-        return not all(label == IGNORE_INDEX for label in example["labels"])
+        return not all(label == IGNORE_INDEX for label in example["labels"])#过滤掉所有标签都是 IGNORE_INDEX 的样本
 
     train_dataset = None
     max_train_samples = 0
@@ -599,7 +614,7 @@ def main():
                 preprocess_function,
                 batched=True,
                 num_proc=data_args.preprocessing_num_workers,
-                remove_columns=train_dataset.column_names,
+                remove_columns=train_dataset.column_names,# 删除原始数据集的列
                 load_from_cache_file=not data_args.overwrite_cache,
                 desc="Running tokenizer on dataset" if is_main_process else None,
             )
@@ -927,11 +942,11 @@ def main():
         model.is_parallelizable = True
         model.model_parallel = True
 
-    data_collator = DataCollatorForSeq2Seq(
+    data_collator = DataCollatorForSeq2Seq(#对样本长度进行填充pading
         tokenizer=tokenizer,
         model=model,
         label_pad_token_id=IGNORE_INDEX,
-        pad_to_multiple_of=4 if tokenizer.padding_side == "right" else None,  # for shifted sparse attention
+        pad_to_multiple_of=4 if tokenizer.padding_side == "right" else None,  # for shifted sparse attention，可以把长度补成 4 的倍数，便于某些硬件或 attention 实现
     )
     # Initialize our Trainer
     trainer = SavePeftModelTrainer(
