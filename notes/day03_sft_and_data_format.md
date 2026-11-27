@@ -103,7 +103,7 @@ length_ratio = chosen_tokens / max(rejected_tokens, 1)
 
 ```python
 with open("data.json", encoding="utf-8") as f:
-    records = json.load(f)
+    records = json.dload(f)
 ```
 
 ### 3.2 JSONL
@@ -1366,12 +1366,12 @@ model_args, data_args, training_args, script_args = (
 
 命令行参数按照字段名进入对应数据类：
 
-| 参数对象 | 负责内容 | 示例 |
-|---|---|---|
-| `ModelArguments` | 模型、tokenizer、精度、量化、缓存 | `model_name_or_path`、`load_in_4bit` |
-| `DataArguments` | 数据路径和预处理 | `train_file_dir`、`max_train_samples` |
-| `Seq2SeqTrainingArguments` | Trainer通用训练设置 | batch、epoch、lr、save策略 |
-| `ScriptArguments` | 项目自定义SFT/PEFT设置 | `use_peft`、rank、模板 |
+| 参数对象                     | 负责内容                          | 示例                                      |
+| ---------------------------- | --------------------------------- | ----------------------------------------- |
+| `ModelArguments`           | 模型、tokenizer、精度、量化、缓存 | `model_name_or_path`、`load_in_4bit`  |
+| `DataArguments`            | 数据路径和预处理                  | `train_file_dir`、`max_train_samples` |
+| `Seq2SeqTrainingArguments` | Trainer通用训练设置               | batch、epoch、lr、save策略                |
+| `ScriptArguments`          | 项目自定义SFT/PEFT设置            | `use_peft`、rank、模板                  |
 
 例如：
 
@@ -1436,11 +1436,11 @@ Qwen/Qwen3.5-0.8B              # Hugging Face模型ID
 
 区别：
 
-| 参数 | 含义 |
-|---|---|
-| `model_name_or_path` | 要加载哪个模型 |
-| `cache_dir` | 下载/转换后的缓存放在哪里 |
-| `output_dir` | 本次训练结果和checkpoint放在哪里 |
+| 参数                   | 含义                             |
+| ---------------------- | -------------------------------- |
+| `model_name_or_path` | 要加载哪个模型                   |
+| `cache_dir`          | 下载/转换后的缓存放在哪里        |
+| `output_dir`         | 本次训练结果和checkpoint放在哪里 |
 
 当前脚本将 `cache_dir` 传给了：
 
@@ -1783,12 +1783,12 @@ labels += (
 
 即：
 
-| 内容 | 在 input_ids 中 | 直接参与 loss |
-|---|---:|---:|
-| system/user和角色模板 | 是 | 否 |
-| assistant回答 | 是 | 是 |
-| 回答后的EOS | 是 | 是 |
-| batch padding | 是 | 否 |
+| 内容                  | 在 input_ids 中 | 直接参与 loss |
+| --------------------- | --------------: | ------------: |
+| system/user和角色模板 |              是 |            否 |
+| assistant回答         |              是 |            是 |
+| 回答后的EOS           |              是 |            是 |
+| batch padding         |              是 |            否 |
 
 多轮对话中每轮 assistant 回答都会参与 loss。全是 `IGNORE_INDEX` 的样本会被过滤。
 
@@ -1810,11 +1810,11 @@ IGNORE_INDEX = LabelSmoother.ignore_index = -100
 
 区别：
 
-| 值 | 含义 |
-|---|---|
-| `-100` | loss忽略标记，不属于词表 |
+| 值               | 含义                            |
+| ---------------- | ------------------------------- |
+| `-100`         | loss忽略标记，不属于词表        |
 | `pad_token_id` | 词表中真实padding token的整数ID |
-| `eos_token_id` | 词表中EOS token的整数ID |
+| `eos_token_id` | 词表中EOS token的整数ID         |
 
 Tokenizer 同时有字符串和数字形式：
 
@@ -1840,11 +1840,11 @@ model = AutoModelForCausalLM.from_pretrained(
 
 完整关系：
 
-| 内容 | 保存位置 | 作用 |
-|---|---|---|
+| 内容     | 保存位置                | 作用                            |
+| -------- | ----------------------- | ------------------------------- |
 | 结构代码 | `modeling_qwen3_5.py` | 定义层、Attention、MLP和forward |
-| 结构参数 | `config.json` | 层数、维度、头数、词表大小 |
-| 权重数值 | `.safetensors` | 训练得到的矩阵数值 |
+| 结构参数 | `config.json`         | 层数、维度、头数、词表大小      |
+| 权重数值 | `.safetensors`        | 训练得到的矩阵数值              |
 
 Qwen3.5-0.8B 的实际 `config.json` 包含类似：
 
@@ -1928,21 +1928,21 @@ model(**batch)
 
 三个关键开关控制不同层面：
 
-| 参数 | 控制内容 |
-|---|---|
-| `load_in_4bit/load_in_8bit` | Base权重如何加载 |
-| `qlora` | 4-bit时是否使用NF4+double quant配置 |
-| `use_peft` | 是否插入LoRA/PEFT adapter |
+| 参数                          | 控制内容                            |
+| ----------------------------- | ----------------------------------- |
+| `load_in_4bit/load_in_8bit` | Base权重如何加载                    |
+| `qlora`                     | 4-bit时是否使用NF4+double quant配置 |
+| `use_peft`                  | 是否插入LoRA/PEFT adapter           |
 
 典型组合：
 
-| 配置 | 结果 |
-|---|---|
-| `use_peft=True, load_in_4bit=False` | 普通LoRA |
-| `use_peft=True, load_in_4bit=True, qlora=True` | QLoRA |
+| 配置                                              | 结果                                           |
+| ------------------------------------------------- | ---------------------------------------------- |
+| `use_peft=True, load_in_4bit=False`             | 普通LoRA                                       |
+| `use_peft=True, load_in_4bit=True, qlora=True`  | QLoRA                                          |
 | `use_peft=True, load_in_4bit=True, qlora=False` | 通用4-bit Base + LoRA，未启用项目完整QLoRA配方 |
-| `use_peft=False, qlora=True` | 配置矛盾，没有adapter就不是QLoRA |
-| `use_peft=False, load_in_4bit=True` | 试图全参训练量化Base，当前路径通常不适用 |
+| `use_peft=False, qlora=True`                    | 配置矛盾，没有adapter就不是QLoRA               |
+| `use_peft=False, load_in_4bit=True`             | 试图全参训练量化Base，当前路径通常不适用       |
 
 QLoRA 原论文围绕 4-bit 设计，所以 8-bit 分支没有 NF4/double-quant 组合；8-bit Base 与 LoRA 组合通常称为 8-bit LoRA。
 
@@ -2252,12 +2252,12 @@ save_model(model, tokenizer, training_args)
 
 区别：
 
-| 保存动作 | 位置/时间 | 主要作用 |
-|---|---|---|
-| `SavePeftModelTrainer.save_model()` | 周期性checkpoint | 保存当时模型/adapter |
-| Trainer `_save_checkpoint` | 周期性checkpoint | 额外保存optimizer/scheduler/state |
-| `trainer.save_state()` | 训练结束 | 保存Trainer状态 |
-| 全局 `save_model()` | output根目录 | 保存最终模型/adapter和tokenizer |
+| 保存动作                              | 位置/时间        | 主要作用                          |
+| ------------------------------------- | ---------------- | --------------------------------- |
+| `SavePeftModelTrainer.save_model()` | 周期性checkpoint | 保存当时模型/adapter              |
+| Trainer `_save_checkpoint`          | 周期性checkpoint | 额外保存optimizer/scheduler/state |
+| `trainer.save_state()`              | 训练结束         | 保存Trainer状态                   |
+| 全局 `save_model()`                 | output根目录     | 保存最终模型/adapter和tokenizer   |
 
 目录通常是：
 
@@ -2326,11 +2326,11 @@ global batch
 
 这里应区分三个量：
 
-| 概念 | 当前样本数 | 含义 |
-|---|---:|---|
-| 单卡 mini-batch | 2 | 每个 GPU/进程一次前向传播读取 2 条样本 |
-| 多卡一次 micro-batch | 4 | 两张卡同时各处理 2 条，共处理 4 条 |
-| 全局有效 batch | 32 | 连续累积 8 个 micro-batch 后更新一次参数 |
+| 概念                 | 当前样本数 | 含义                                     |
+| -------------------- | ---------: | ---------------------------------------- |
+| 单卡 mini-batch      |          2 | 每个 GPU/进程一次前向传播读取 2 条样本   |
+| 多卡一次 micro-batch |          4 | 两张卡同时各处理 2 条，共处理 4 条       |
+| 全局有效 batch       |         32 | 连续累积 8 个 micro-batch 后更新一次参数 |
 
 `gradient_accumulation_steps=8` 表示连续进行 8 次前向和反向传播，将梯度累积起来，第 8 次以后才执行一次 `optimizer.step()`，随后清空梯度。它用更多计算时间换取较低的单次显存峰值，但不会减少模型权重和优化器状态本身占用的显存。
 
@@ -2338,20 +2338,20 @@ Trainer 中的一个 `global_step` 通常对应一次优化器更新，而不是
 
 ### 24.24 训练启动参数及所属位置
 
-| 参数 | 所属位置 | 作用 |
-|---|---|---|
-| `CUDA_VISIBLE_DEVICES` | Shell/CUDA 环境变量 | 控制当前程序能够看到哪些物理 GPU |
-| `torchrun --nproc_per_node` | `torchrun` 启动参数 | 当前节点启动多少个训练进程 |
-| `per_device_train_batch_size` | `Seq2SeqTrainingArguments` | 每个 GPU/进程一次读取的训练样本数 |
-| `gradient_accumulation_steps` | `Seq2SeqTrainingArguments` | 累积多少个 micro-batch 后更新一次参数 |
-| `model_max_length` | 项目自定义 `ScriptArguments` | 模板处理和分词后每条样本允许的最大 token 长度 |
-| `num_train_epochs` | `Seq2SeqTrainingArguments` | 完整遍历训练集的次数 |
-| `learning_rate` | `Seq2SeqTrainingArguments` | 优化器更新参数的基础步长 |
-| `eval_steps` | `Seq2SeqTrainingArguments` | 当 `eval_strategy=steps` 时，每隔多少个更新步验证 |
-| `save_steps` | `Seq2SeqTrainingArguments` | 当 `save_strategy=steps` 时，每隔多少个更新步保存 checkpoint |
-| `output_dir` | `Seq2SeqTrainingArguments` | 最终模型和训练 checkpoint 的输出目录 |
-| `bf16` | `Seq2SeqTrainingArguments` | 启用 BF16 混合精度训练 |
-| `gradient_checkpointing` | `Seq2SeqTrainingArguments` | 反向传播时重算部分激活值，以计算时间换显存 |
+| 参数                            | 所属位置                       | 作用                                                           |
+| ------------------------------- | ------------------------------ | -------------------------------------------------------------- |
+| `CUDA_VISIBLE_DEVICES`        | Shell/CUDA 环境变量            | 控制当前程序能够看到哪些物理 GPU                               |
+| `torchrun --nproc_per_node`   | `torchrun` 启动参数          | 当前节点启动多少个训练进程                                     |
+| `per_device_train_batch_size` | `Seq2SeqTrainingArguments`   | 每个 GPU/进程一次读取的训练样本数                              |
+| `gradient_accumulation_steps` | `Seq2SeqTrainingArguments`   | 累积多少个 micro-batch 后更新一次参数                          |
+| `model_max_length`            | 项目自定义 `ScriptArguments` | 模板处理和分词后每条样本允许的最大 token 长度                  |
+| `num_train_epochs`            | `Seq2SeqTrainingArguments`   | 完整遍历训练集的次数                                           |
+| `learning_rate`               | `Seq2SeqTrainingArguments`   | 优化器更新参数的基础步长                                       |
+| `eval_steps`                  | `Seq2SeqTrainingArguments`   | 当 `eval_strategy=steps` 时，每隔多少个更新步验证            |
+| `save_steps`                  | `Seq2SeqTrainingArguments`   | 当 `save_strategy=steps` 时，每隔多少个更新步保存 checkpoint |
+| `output_dir`                  | `Seq2SeqTrainingArguments`   | 最终模型和训练 checkpoint 的输出目录                           |
+| `bf16`                        | `Seq2SeqTrainingArguments`   | 启用 BF16 混合精度训练                                         |
+| `gradient_checkpointing`      | `Seq2SeqTrainingArguments`   | 反向传播时重算部分激活值，以计算时间换显存                     |
 
 `model_max_length` 限制的是 system、user、assistant 和特殊 token 组成的完整训练序列，不是最大新生成长度。`eval_steps` 和 `save_steps` 计算的是优化器更新步；如果总更新步数没有达到设定值，训练过程中就不会出现对应周期的验证或 checkpoint。
 
@@ -2448,13 +2448,13 @@ human
 
 各字段的作用：
 
-| 字段/角色 | 含义 | 训练中的位置 |
-|---|---|---|
-| `tools` | 工具名称、说明、参数schema和必填字段 | 被格式化为system工具说明 |
-| `human` | 用户提出的任务 | 输入，默认不参与回答loss |
-| `function_call` | 模型选择的工具和JSON参数 | assistant目标，参与loss |
-| `observation` | 外部程序执行工具后的返回值 | 环境输入，默认不参与回答loss |
-| `gpt` | 模型根据工具结果整理的最终回答 | assistant目标，参与loss |
+| 字段/角色         | 含义                                 | 训练中的位置                 |
+| ----------------- | ------------------------------------ | ---------------------------- |
+| `tools`         | 工具名称、说明、参数schema和必填字段 | 被格式化为system工具说明     |
+| `human`         | 用户提出的任务                       | 输入，默认不参与回答loss     |
+| `function_call` | 模型选择的工具和JSON参数             | assistant目标，参与loss      |
+| `observation`   | 外部程序执行工具后的返回值           | 环境输入，默认不参与回答loss |
+| `gpt`           | 模型根据工具结果整理的最终回答       | assistant目标，参与loss      |
 
 `supervised_finetuning.py` 会把 `function_call` 映射为 assistant，把 `observation` 格式化后映射为 user，并根据 `--tool_format` 生成对应模型家族的调用格式。
 
@@ -2526,18 +2526,18 @@ effective batch
 
 这里的Trainer `global_step` 通常是一次 `optimizer.step()`，不是一次单样本前向传播。
 
-| 参数 | 当前值 | 作用 |
-|---|---:|---|
-| `warmup_steps` | 1 | 第1个优化器更新步进行学习率预热 |
-| `logging_strategy` | `steps` | 按优化器更新步记录日志 |
-| `logging_steps` | 1 | 每一步记录loss、学习率等指标 |
-| `eval_strategy` | `steps` | 按更新步执行验证 |
-| `eval_steps` | 2 | 第2、4、6步附近验证 |
-| `save_strategy` | `steps` | 按更新步保存checkpoint |
-| `save_steps` | 3 | 第3、6步附近保存checkpoint |
-| `save_total_limit` | 2 | 最多保留两个周期性checkpoint |
+| 参数                        |              当前值 | 作用                                                         |
+| --------------------------- | ------------------: | ------------------------------------------------------------ |
+| `warmup_steps`            |                   1 | 第1个优化器更新步进行学习率预热                              |
+| `logging_strategy`        |           `steps` | 按优化器更新步记录日志                                       |
+| `logging_steps`           |                   1 | 每一步记录loss、学习率等指标                                 |
+| `eval_strategy`           |           `steps` | 按更新步执行验证                                             |
+| `eval_steps`              |                   2 | 第2、4、6步附近验证                                          |
+| `save_strategy`           |           `steps` | 按更新步保存checkpoint                                       |
+| `save_steps`              |                   3 | 第3、6步附近保存checkpoint                                   |
+| `save_total_limit`        |                   2 | 最多保留两个周期性checkpoint                                 |
 | `TENSORBOARD_LOGGING_DIR` | `.../tensorboard` | 在Transformers 5.17中固定TensorBoard event文件目录的环境变量 |
-| `report_to` | `tensorboard` | 启用Trainer的TensorBoard集成 |
+| `report_to`               |     `tensorboard` | 启用Trainer的TensorBoard集成                                 |
 
 `eval_steps` 只有配合 `eval_strategy=steps` 才控制周期验证；`save_steps` 同理需要 `save_strategy=steps`。当前环境的Transformers 5.17.0没有 `Seq2SeqTrainingArguments.logging_dir` 字段，传入 `--logging_dir` 会被 `HfArgumentParser` 判为未使用参数并报错。脚本改用 `TENSORBOARD_LOGGING_DIR` 环境变量；它不是模型权重目录，真正的模型和checkpoint写入 `output_dir`。若不设置该环境变量，TensorBoard回调默认写到 `output_dir/runs/...`。
 
@@ -2577,6 +2577,353 @@ train_dataset = train_dataset.select(range(max_train_samples))
 个人实验品牌使用 **MedAegis**，可描述为“面向医疗大模型的风险感知与证据约束对齐系统”。`MedicalGPT` 是当前使用和学习的上游训练仓库。品牌重命名不能等同于从零实现训练框架；面试和发布时应明确个人完成的数据治理、安全任务设计、SFT/DPO实验、评测和bad-case分析，同时保留所复用开源代码的许可证与来源说明。
 
 最终可以建立独立的MedAegis交付仓库，只迁移真实使用和改造的模块；不应为了隐藏依赖而删除Apache 2.0许可证或误报框架来源。
+
+---
+
+## 25. LoRA smoke训练实录：日志、评估、checkpoint与已发现问题
+
+本节记录使用 `Qwen/Qwen3.5-0.8B`、24条训练样本和10条独立验证样本执行LoRA smoke训练后的结论。该次运行证明训练链路可以跑通，但发现了Qwen3.5多轮chat template切片错误，因此当前adapter只能作为链路测试产物，不能作为正式效果结论。
+
+### 25.1 本次训练配置与步数
+
+关键配置为：
+
+```text
+per_device_train_batch_size = 1
+gradient_accumulation_steps = 4
+GPU数 = 1
+num_train_epochs = 1
+train_samples = 24
+eval_samples = 10
+```
+
+有效batch为：
+
+```text
+1 × 1 × 4 = 4条样本/optimizer step
+```
+
+所以一个epoch共有：
+
+```text
+24 ÷ 4 = 6个optimizer step
+```
+
+当前设置每2步验证、每3步保存，因此实际发生：
+
+```text
+step 2：验证
+step 3：保存checkpoint-3
+step 4：验证
+step 6：验证并保存checkpoint-6
+```
+
+运行结果：训练约33秒，平均 `train_loss=3.2193`；训练期间验证loss为 `3.0115 → 2.9621 → 2.9333`。这只能说明小验证集上的token预测loss略有下降，不能直接说明医疗安全性、事实正确性或生成质量改善。
+
+### 25.2 验证阶段实际计算什么
+
+当前配置：
+
+```text
+predict_with_generate = False
+per_device_eval_batch_size = 1
+```
+
+所以 `trainer.evaluate()` 不调用 `model.generate()`，而是把验证样本的prompt和标准assistant答案一起输入模型，通过teacher forcing计算next-token cross entropy：
+
+```python
+with torch.no_grad():
+    outputs = model(
+        input_ids=input_ids,
+        attention_mask=attention_mask,
+        labels=labels,
+    )
+    loss = outputs.loss
+```
+
+验证数据先从 `validation_file_dir` 递归读取 `.jsonl`，再由 `preprocess_function()` 转换为：
+
+```python
+{
+    "input_ids": [...],
+    "attention_mask": [...],
+    "labels": [...],
+}
+```
+
+`system/user`和padding位置的label是 `-100`，只有assistant答案及其结束符参与loss。因为本次eval batch size为1，可以近似理解为：先计算每条样本内部有效assistant token的平均loss，再对10条样本的loss求平均。若batch size大于1，模型通常先返回整个batch有效token上的一个标量loss，就不能再严格说得到了每条样本各自独立的loss。
+
+最终代码还计算：
+
+```python
+perplexity = math.exp(metrics["eval_loss"])
+```
+
+本次 `eval_loss=2.9342`、`perplexity=18.8073`。Perplexity仍是token预测指标，不是医疗正确率。正式评测还必须独立执行生成式smoke prompts，统计危险建议率、急症处置率、信息不足处理率和过度拒答率等指标。
+
+### 25.3 调试batch中的 `input_ids` 和 `labels`
+
+训练前代码会取一个DataLoader batch：
+
+```python
+sample = next(iter(trainer.get_train_dataloader()))
+```
+
+随后打印：
+
+```python
+logger.debug(
+    f"input_ids:\n{list(sample['input_ids'])[:3]}, "
+    f"\nlabels:\n{list(sample['labels'])[:3]}"
+)
+logger.debug(
+    f"Decode input_ids[0]:\n"
+    f"{tokenizer.decode(sample['input_ids'][0])}"
+)
+replaced_labels = [
+    label if label != IGNORE_INDEX else tokenizer.pad_token_id
+    for label in sample["labels"][0]
+]
+logger.debug(
+    f"Decode labels[0]:\n"
+    f"{tokenizer.decode(replaced_labels)}"
+)
+```
+
+`sample['input_ids']`通常是 `[batch, seq]`；转换为 `list` 后，`[:3]` 表示batch中的前三个样本，不是每条样本的前三个token。本次batch size为1，因此只会打印一条。
+
+`-100`不是合法token ID，不能直接交给tokenizer解码，所以调试代码只在临时变量中把它替换为 `pad_token_id`。因此Decode labels中出现的大量 `<|endoftext|>` 只是原 `-100` 的可视化占位，不表示模型正在学习这些pad token，也不会修改真实训练labels。
+
+该解码检查非常重要，它能确认system prompt、角色、特殊token、截断和loss mask是否正确。本次多轮数据错误正是由这里暴露出来。
+
+### 25.4 日志、终端输出、JSON和TensorBoard的区别
+
+`log`意为日志，但本项目存在不同日志出口：
+
+| 调用或参数                             | 主要结果                              |
+| -------------------------------------- | ------------------------------------- |
+| `logger.info/debug(...)`             | Loguru默认写到终端的`stderr`        |
+| `trainer.log_metrics(...)`           | 把阶段指标格式化打印到终端            |
+| `trainer.save_metrics("train", ...)` | 写 `train_results.json`             |
+| `trainer.save_metrics("eval", ...)`  | 写 `eval_results.json`              |
+| 两次 `save_metrics(...)`             | 合并维护 `all_results.json`         |
+| `trainer.save_state()`               | 写 `trainer_state.json`             |
+| `--report_to tensorboard`            | 启用TensorBoard callback并写event文件 |
+
+`INFO`是日志级别，`stderr`是输出通道，两者不是同一个概念。Loguru默认把DEBUG、INFO、WARNING和ERROR统一写到标准错误流，便于与程序的主要stdout结果分开；写入stderr不代表INFO是错误。
+
+保存完整终端输出可以使用：
+
+```bash
+bash ./notes/day3/test/run_sft.sh 2>&1 \
+  | tee ./notes/day3/test/artifacts/medaegis_sft_smoke/train_console.log
+```
+
+`report_to=['tensorboard']` 会生成 `events.out.tfevents...` 二进制事件日志。若最终解析出的 `report_to` 为 `none` 或空列表，终端日志、结果JSON和checkpoint仍正常生成，但不会产生新的TensorBoard曲线文件。仅设置日志目录并不等于启用TensorBoard。
+
+查看结果时：
+
+```text
+train_results.json：最终训练汇总
+eval_results.json：最终单独验证汇总
+all_results.json：训练和验证指标合并
+trainer_state.json：逐step的loss、grad_norm、learning_rate和运行状态
+TensorBoard events：用于查看曲线
+adapter_model.safetensors：推理需要的LoRA权重，不是日志
+```
+
+### 25.5 checkpoint中的模型与续训状态
+
+项目重写的 `SavePeftModelTrainer.save_model()` 负责按PEFT方式保存adapter；父类Trainer的 `_save_checkpoint()` 继续保存优化器、调度器、随机状态和Trainer状态。因此 `checkpoint-3/`、`checkpoint-6/` 中包含：
+
+```text
+adapter_model.safetensors：LoRA参数
+adapter_config.json：LoRA配置
+optimizer.pt：AdamW一阶/二阶动量、step、参数组等状态
+scheduler.pt：学习率调度器当前step、base learning rate、last learning rate等
+trainer_state.json：global_step、epoch、log_history等
+rng_state.pth：Python/NumPy/PyTorch CPU与CUDA随机状态
+training_args.bin：训练参数对象
+```
+
+这些文件由Trainer内部根据 `save_strategy=steps`、`save_steps=3` 自动保存。因为当前 `save_only_model=False`，optimizer和scheduler状态也会保留，可以进行较完整的断点续训；若只保存模型，则文件更小，但无法精确恢复优化器动量和学习率进度。
+
+### 25.6 梯度范数与梯度裁剪
+
+把全部可训练参数的梯度看作一个长向量，L2梯度范数为：
+
+```text
+grad_norm = sqrt(g1² + g2² + ... + gn²)
+```
+
+本次为LoRA训练，主要是LoRA可训练参数具有梯度，Base权重被冻结。Trainer在4个micro-batch完成梯度累积后、`optimizer.step()`之前执行全局梯度裁剪：
+
+```python
+if self.args.max_grad_norm > 0:
+    grad_norm = self._clip_grad_norm(model)
+self.optimizer.step()
+```
+
+当前 `max_grad_norm=1.0`。若裁剪前范数为9，则所有梯度按约 `1/9` 的相同比例缩小，使方向基本不变、整体范数降到约1。日志中的 `grad_norm` 是裁剪前数值；它用于观察梯度强度，不能只看到8～10就断定梯度爆炸。本次没有NaN、Inf或loss失控。
+
+### 25.7 Linear scheduler与warmup
+
+脚本没有显式传入 `--lr_scheduler_type linear`，但当前 `Seq2SeqTrainingArguments` 默认值就是 `linear`；为提高复现性，可以在脚本中明确写出。
+
+本次：
+
+```text
+learning_rate = 2e-5
+warmup_steps = 1
+lr_scheduler_type = linear
+max_steps = 6
+```
+
+学习率先从较小值升到峰值，再线性衰减。实际日志为：
+
+```text
+step 1：0
+step 2：2e-5
+step 3：1.6e-5
+step 4：1.2e-5
+step 5：8e-6
+step 6：4e-6
+训练结束后约为0
+```
+
+warmup用于避免训练刚开始时，在AdamW动量尚未建立、早期梯度可能不稳定的情况下立即使用峰值学习率。当前Transformers先用当前学习率执行 `optimizer.step()`，再让scheduler推进下一步，因此第一步学习率为0时模型权重基本不变，但Adam内部状态仍可能更新。
+
+本次总共只有6步，1步warmup占16.7%，对smoke测试无妨，但若希望极短实验每一步都改变权重，可设 `warmup_steps=0`。正式长训练通常按总步数设置较小warmup比例，再根据验证结果调优。
+
+### 25.8 训练后恢复KV cache与左填充
+
+训练开启Gradient Checkpointing时使用：
+
+```python
+model.gradient_checkpointing_enable()
+model.config.use_cache = False
+```
+
+训练完成后项目恢复：
+
+```python
+model.config.use_cache = True
+tokenizer.padding_side = "left"
+tokenizer.init_kwargs["padding_side"] = "left"
+```
+
+`use_cache=True` 启用生成阶段的KV cache，避免每生成一个新token都重新计算全部历史token；训练时它额外占显存且与Gradient Checkpointing冲突，所以训练期间关闭。
+
+右填充把PAD放在短序列末尾，适合训练；左填充把PAD放在开头，使批量自回归生成时每个样本最后一列都是最后一个真实token，适合decoder-only模型生成。更新 `init_kwargs` 是为了让保存后的tokenizer重新加载时也使用左填充。
+
+当前代码在恢复cache和左填充之后才执行最终 `trainer.evaluate()`，而训练中的周期验证使用的是 `use_cache=False` 和右填充。理论上正确的attention mask和position处理应使有效token的loss基本不变，但为了严格控制变量，更合理的顺序是先完成最终loss评估，再恢复推理配置。不能仅凭最后两次loss相差约0.001，就断定差异由这两行导致。
+
+### 25.9 PEFT保存时访问Hub超时
+
+保存adapter时出现：
+
+```text
+Unable to fetch remote file ... config.json
+Could not find a config file ... will assume that the vocabulary was not modified
+```
+
+这不表示Base模型没有成功加载。训练开始时 `AutoConfig/AutoModel.from_pretrained()` 可以直接从 `cache_dir` 中读取已下载的配置和权重，并将权重加载到CPU/GPU；保存LoRA时，PEFT只拿到 `Qwen/Qwen3.5-0.8B` 这个Hub仓库标识，又发起了一次独立的远程检查，以判断微调期间词表是否扩充。后一次请求超时不影响已经驻留在内存/GPU中的Base权重。
+
+PEFT需要检查词表，是因为普通LoRA通常只保存A/B低秩矩阵，不保存完整input embedding和 `lm_head`。如果新增token后embedding尺寸变化，保存时必须额外处理对应权重。本次只是把已经存在的 `<|im_end|>` 登记为BOS，没有创建新token ID，也没有调用 `resize_token_embeddings()`，因此可以暂时忽略该保存警告。
+
+### 25.10 LoRA、词表扩充、embedding与 `lm_head`
+
+普通LoRA默认冻结Base权重，只训练插入目标线性层的LoRA A/B。`tokenizer.add_tokens()` 和 `model.resize_token_embeddings()` 只负责扩大矩阵并初始化新行，不会保证新增token对应的embedding自动参与训练。
+
+若训练期间真正扩充词表，必须明确处理：
+
+```text
+input embedding：token ID → hidden vector
+lm_head：hidden vector → vocabulary logits
+```
+
+常见方案包括：
+
+1. 使用PEFT的 `modules_to_save` 让 `embed_tokens`、`lm_head` 整个模块一起解冻、训练并保存；
+2. 使用支持的PEFT版本只训练指定新增token行；
+3. 将 `lm_head` 放入 `target_modules` 只会对它增加LoRA支路，不等于完整解冻，也不能自动解决input embedding的新token学习问题。
+
+“PEFT检测到词表变化并保存embedding”和“embedding训练时真的更新”是两件事。最终应检查 `requires_grad` 和trainable parameter名称，而不是只看保存结果。
+
+### 25.11 Qwen3.5多轮chat template的静默数据损坏
+
+当前预处理通过下面的字符切片提取“本轮新增prompt”：
+
+```python
+cur_text = tokenizer.apply_chat_template(
+    accumulated,
+    tokenize=False,
+    add_generation_prompt=True,
+)
+convs.append(cur_text[len(prev_text):])
+```
+
+它隐含假设：
+
+```python
+cur_text.startswith(prev_text) is True
+```
+
+但Qwen3.5对“当前最后一条assistant消息”和“已成为历史的assistant消息”采用不同模板格式。第一轮结束时 `prev_text` 可能包含：
+
+```text
+<|im_start|>assistant
+<think>
+
+</think>
+
+第一轮回答<|im_end|>
+```
+
+加入第二轮user并重新渲染后，历史assistant可能变为：
+
+```text
+<|im_start|>assistant
+第一轮回答<|im_end|>
+<|im_start|>user
+第二轮问题<|im_end|>
+```
+
+因此新字符串并不以旧字符串为前缀，仍按 `len(prev_text)` 切片会删掉第二轮用户角色和部分文本。真实样本 `train_018` 的：
+
+```text
+<|im_start|>user
+走楼梯时更明显，还会出冷汗。
+```
+
+被错误切成：
+
+```text
+梯时更明显，还会出冷汗。
+```
+
+当前至少影响训练集2/24条多轮样本和验证集2/10条多轮样本。它属于静默数据损坏：训练不会报错，loss甚至可能下降，但模型接收到的是错误上下文。
+
+修复优先级高于安装可选加速库。当前运行应记录为：
+
+```text
+训练链路smoke test：通过
+单轮预处理：基本通过
+多轮预处理：失败
+正式效果结论：暂不采用
+```
+
+最低限度应先加入保护，防止继续静默训练：
+
+```python
+if prev_text and not cur_text.startswith(prev_text):
+    raise ValueError(
+        "Chat template output is not prefix-stable; "
+        "multi-turn slicing would corrupt the sample."
+    )
+```
+
+这只能发现问题，不能真正修复。正式方案应一次性构造完整messages，并按assistant token区间建立labels，而不是依赖Python字符串字符数切片。修复后需要用单轮、多轮和system prompt样本做回归测试，解码检查角色与mask，再重新运行24/10条smoke训练。
 
 ---
 

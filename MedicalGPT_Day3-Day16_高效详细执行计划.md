@@ -1,6 +1,9 @@
 # MedicalGPT：Day 3–16 高效详细执行计划
 
-> 当前进度：只完成 Day 1–2。本文从 Day 3 继续，不要求重做已学内容。
+> **Day 4–Day 7 已有更清晰的统一执行版：[MedicalGPT Day 4–Day 7 统一执行计划](MedicalGPT_Day4-Day7_统一执行计划.md)。**
+> 当前 Day 1–Day 3 已完成；接下来请按统一版执行，不要再把本文旧 Day 5–7 与原十天计划旧 Day 4 叠加。完成统一版后，从本文 Day 8 继续。
+
+> 历史进度说明：本文最初按“只完成 Day 1–2”编写；目前 Day 3 也已完成。
 > 主线：真实失败 → 数据与评测规范 → 公平 SFT 对照 → 安全 DPO → 消融与最终评测 → 服务与复现。
 > 配套：[原计划与历史修订](MedicalGPT_10天新手详细学习与项目规划_9月19日起.md)。原内容未删除，本文是最新每日执行入口。
 > 本文所有新增实验和文件均为待办，不是已完成成果。本次编写计划不执行训练、下载或覆盖预测。
@@ -9,7 +12,7 @@
 
 ### 时间与前提
 
-总计16个学习日，已完成2天，剩余14天；每天09:00–12:00、14:00–18:00，共约7小时，另留2–4个机动日。剩余主计划约98小时，是积极的排期估计，不是完工保证。数据资料、可用GPU、教师调用预算或审核进度不足时应延期，不靠跳过验证赶进度。
+总计 16 个学习日，已完成 3 天，剩余 13 天；每天 09:00–12:00、14:00–18:00，共约 7 小时，另留 2–4 个机动日。剩余主计划约 91 小时，是积极的排期估计，不是完工保证。数据资料、可用 GPU、教师调用预算或审核进度不足时应延期，不靠跳过验证赶进度。
 
 效率来自四件事：
 
@@ -23,7 +26,7 @@
 ### 文件标记与阅读方法
 
 - **已有**：仓库当前存在，可直接打开。
-- **计划新增**：学习到当天再实现，当前不存在也正常。`project/medguard/` 是计划目录，不要误以为已有完整项目代码。
+- **计划新增**：学习到当天再实现，当前不存在也正常。`project/medaegis/` 是计划目录，不要误以为已有完整项目代码。
 - 日志统一用 `notes/day03_...` 等本文命名；已有同名笔记先检查并追加，绝不直接覆盖。
 - 所有相对路径以 `/home/gycing/llm/MedicalGPT` 为根。IDE内用搜索定位函数名，比依赖容易变化的行号更稳。
 - 每个函数先回答：输入是什么、输出是什么、谁调用它、改变了什么、如何验证；每段最多记3–5条，不整段复制源码。
@@ -80,7 +83,7 @@ E0=4B未微调基础任务提示；E0P=同一模型改进提示；E1=随机4K SF
 
 ### 09:00–10:00｜生成你自己的 smoke 配置
 
-对照Day 3参数表，选0.8B、获准GPU、batch=1、短序列、10–100条独立样本。示例训练与验证都指向 `data/sft`，必须改成不同数据；示例 `flash_attn=True` 不代表已装好，首轮关闭可选加速。保存配置到 **计划新增** `project/medguard/configs/sft_smoke.*`，不要覆盖示例。
+对照Day 3参数表，选0.8B、获准GPU、batch=1、短序列、10–100条独立样本。示例训练与验证都指向 `data/sft`，必须改成不同数据；示例 `flash_attn=True` 不代表已装好，首轮关闭可选加速。保存配置到 **计划新增** `project/medaegis/configs/sft_smoke.*`，不要覆盖示例。
 
 ### 10:00–12:00｜先2–5步，再小训练
 
@@ -110,7 +113,7 @@ E0=4B未微调基础任务提示；E0P=同一模型改进提示；E1=随机4K SF
 
 根据失败定义：已知事实、信息缺口、风险升级、证据与简短回应。保留原候选诊断字段作可审核的研究输出，不将其展示成远程确诊。统一 `triage/risk_level` 命名；输入原文引用与外部医学证据分别存。
 
-**计划新增** `project/medguard/schemas/response.schema.json` 与 `project/medguard/evaluation/rubric.md`；先手写3个合格及3个不合格输出测试schema。
+**计划新增** `project/medaegis/schemas/response.schema.json` 与 `project/medaegis/evaluation/rubric.md`；先手写3个合格及3个不合格输出测试schema。
 
 ### 10:00–12:00｜来源、病例分组和标签协议
 
@@ -124,7 +127,7 @@ E0=4B未微调基础任务提示；E0P=同一模型改进提示；E1=随机4K SF
 
 ### 16:30–18:00｜封存规范与自测
 
-- **交付**：`notes/day05_task_and_eval_data.md`；schema/rubric；**计划新增** `project/medguard/data/eval/` 中的开发/测试及manifest；未审核清单。
+- **交付**：`notes/day05_task_and_eval_data.md`；schema/rubric；**计划新增** `project/medaegis/data/eval/` 中的开发/测试及manifest；未审核清单。
 - **必须会**：训练验证集、开发评测集、最终测试各自用途；近重复泄漏；人工代理审核不等于临床专家验证。
 - **退出条件**：合格数据版本、分组和来源可追溯。若本日未达规模，明确继续审核任务，不把自动生成数当合格题数。
 
@@ -140,7 +143,7 @@ E0=4B未微调基础任务提示；E0P=同一模型改进提示；E1=随机4K SF
 
 ### 10:30–12:00｜先测评分器再评模型
 
-**计划新增** `project/medguard/evaluation/score_predictions.py` 与相应测试。用手写输出验证schema、分母、超时计数；行为rubric评整段，不以出现“120”自动通过。无可核查断言时证据分NA，任务成功另评，不能空回答得满分。
+**计划新增** `project/medaegis/evaluation/score_predictions.py` 与相应测试。用手写输出验证schema、分母、超时计数；行为rubric评整段，不以出现“120”自动通过。无可核查断言时证据分NA，任务成功另评，不能空回答得满分。
 
 ### 14:00–16:00｜4B适配与 E0/E0P
 
@@ -160,7 +163,7 @@ E0=4B未微调基础任务提示；E0P=同一模型改进提示；E1=随机4K SF
 
 ### 09:00–10:30｜审计和规则过滤
 
-**计划新增** `project/medguard/data_pipeline/audit.py`、`clean.py`。采集许可允许的候选数据，目标约50K；统计字段缺失、长度、来源、语言、隐私风险。原始数据只读保存，坏样本隔离并记录原因。
+**计划新增** `project/medaegis/data_pipeline/audit.py`、`clean.py`。采集许可允许的候选数据，目标约50K；统计字段缺失、长度、来源、语言、隐私风险。原始数据只读保存，坏样本隔离并记录原因。
 
 ### 10:30–12:00｜精确/近重复
 
@@ -184,7 +187,7 @@ E0=4B未微调基础任务提示；E0P=同一模型改进提示；E1=随机4K SF
 
 ### 09:00–10:30｜50条标签试生产
 
-**计划新增** `project/medguard/data_generation/generate_sft.py` 与 `prompts/sft_labeling.txt`。外部教师调用先确认许可、脱敏和预算。两组使用同一教师/提示/校验流程；输出证据、缺失信息和行动边界，不以长推理文本充数。
+**计划新增** `project/medaegis/data_generation/generate_sft.py` 与 `prompts/sft_labeling.txt`。外部教师调用先确认许可、脱敏和预算。两组使用同一教师/提示/校验流程；输出证据、缺失信息和行动边界，不以长推理文本充数。
 
 ### 10:30–12:00｜200条验证及审核
 
@@ -216,7 +219,7 @@ E0=4B未微调基础任务提示；E0P=同一模型改进提示；E1=随机4K SF
 
 ### 14:00–15:30｜冻结公平配置并启动
 
-**计划新增** `project/medguard/configs/e1_random_sft.*`、`e2_curated_sft.*`。固定模型、提示、有效训练token预算、优化设置、种子和验证准则；长度匹配/采样预算解决同4K但token量不同的问题，报告实际差异。只在资源允许时并行两组。
+**计划新增** `project/medaegis/configs/e1_random_sft.*`、`e2_curated_sft.*`。固定模型、提示、有效训练token预算、优化设置、种子和验证准则；长度匹配/采样预算解决同4K但token量不同的问题，报告实际差异。只在资源允许时并行两组。
 
 ### 15:30–18:00｜监控并预学DPO
 
@@ -244,7 +247,7 @@ E0=4B未微调基础任务提示；E0P=同一模型改进提示；E1=随机4K SF
 
 ### 14:00–16:30｜构造和审核约1K偏好对
 
-**计划新增** `project/medguard/preference/build_pairs.py`。覆盖原六类：过度确诊、无依据推断、风险遗漏、药物诱导、格式、过度拒答。比例据开发错误调整。先每类小样本审核，再规模化；同一prompt两回答应尽量只在目标行为上不同，匹配长度/风格，避免“长=好”“拒答=好”的捷径。
+**计划新增** `project/medaegis/preference/build_pairs.py`。覆盖原六类：过度确诊、无依据推断、风险遗漏、药物诱导、格式、过度拒答。比例据开发错误调整。先每类小样本审核，再规模化；同一prompt两回答应尽量只在目标行为上不同，匹配长度/风格，避免“长=好”“拒答=好”的捷径。
 
 保存约1K合格训练对及额外验证对；按病例簇分组，不能跨split共享题干。chosen本身不合格就隔离，不强行二选一。
 
@@ -270,7 +273,7 @@ E0=4B未微调基础任务提示；E0P=同一模型改进提示；E1=随机4K SF
 
 ### 14:00–16:30｜正式 E3
 
-**计划新增** `project/medguard/configs/e3_safety_dpo.*`。使用审核后的训练对运行，保存loss、reward margin、验证结果、耗时和checkpoint。训练等待时补数据卡与偏好质量审计。
+**计划新增** `project/medaegis/configs/e3_safety_dpo.*`。使用审核后的训练对运行，保存loss、reward margin、验证结果、耗时和checkpoint。训练等待时补数据卡与偏好质量审计。
 
 ### 16:30–18:00｜开发行为评测
 
@@ -306,7 +309,7 @@ E0=4B未微调基础任务提示；E0P=同一模型改进提示；E1=随机4K SF
 
 ### 今日目标与第一个文件
 
-先打开最终manifest和 `project/medguard/evaluation/rubric.md`，不是先浏览测试模型输出。
+先打开最终manifest和 `project/medaegis/evaluation/rubric.md`，不是先浏览测试模型输出。
 
 ### 09:00–10:30｜统一运行封存集
 
@@ -338,7 +341,7 @@ HTTP输入→输入验证→构造模板→模型生成→解析JSON→schema校
 
 ### 10:30–12:00｜实现最小接口
 
-**计划新增** `project/medguard/service/app.py`、`schemas.py`、`model_backend.py`、`output_guard.py`；先Transformers后端，提供 `/health`、`/analyze`、模型版本和匿名request ID。不默认公网开放，不保留真实患者内容。
+**计划新增** `project/medaegis/service/app.py`、`schemas.py`、`model_backend.py`、`output_guard.py`；先Transformers后端，提供 `/health`、`/analyze`、模型版本和匿名request ID。不默认公网开放，不保留真实患者内容。
 
 ### 14:00–16:30｜接口与错误测试
 
@@ -366,7 +369,7 @@ HTTP输入→输入验证→构造模板→模型生成→解析JSON→schema校
 
 ### 14:00–16:30｜有定义的性能测试
 
-**计划新增** `project/medguard/service/benchmark.py`。预热后在输入128/512/1024 token档位、固定输出上限、并发1/2/4测量；记录实际输出长度。流式测TTFT，全部请求测p50/p95、成功率、吞吐、GPU峰值；短输出更快不能全部归因后端。
+**计划新增** `project/medaegis/service/benchmark.py`。预热后在输入128/512/1024 token档位、固定输出上限、并发1/2/4测量；记录实际输出长度。流式测TTFT，全部请求测p50/p95、成功率、吞吐、GPU峰值；短输出更快不能全部归因后端。
 
 ### 16:30–18:00｜演示与总结
 

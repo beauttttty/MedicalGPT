@@ -134,3 +134,11 @@ dmypy.json
 outputs-dpo-qwen-v1/
 cache/
 outputs-*/
+
+# Reproducible merged model exports are too large for regular Git/GitHub.
+# Keep them locally or publish them to a model registry such as Hugging Face Hub.
+notes/**/artifacts/*_merged/
+
+# Keep downloaded medical datasets and generated training artifacts local.
+/dataset/medical/
+/notes/day3/test/artifacts/medaegis_sft_smoke/

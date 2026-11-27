@@ -1,16 +1,24 @@
-# MedicalGPT 学习与求职项目规划（2026-10-13 修订）
+# MedicalGPT 学习与求职项目规划（2026-11-09 修订）
 
-## 最新执行入口｜Day 3–16 高效详细版
+## 最新执行入口｜Day 4–Day 7 统一版
 
-用户已完成 Day 1–2。后续按 [Day 3–16 高效详细执行计划](MedicalGPT_Day3-Day16_高效详细执行计划.md) 学习：剩余14个学习日，每日约7小时，另预留2–4个机动日。该文件逐日列出起始文件、源码搜索符号、分时段步骤、检查方法、必会知识及退出条件。
+Day 1–Day 3 已完成。接下来不再分别执行本文旧 Day 4 和 `MedicalGPT_Day3-Day16_高效详细执行计划.md` 旧 Day 5–7，因为它们在数据筛选、评测集和基线上有交叉。唯一执行入口改为：
+
+**[MedicalGPT Day 4–Day 7 统一执行计划](MedicalGPT_Day4-Day7_统一执行计划.md)**
+
+统一顺序是：任务/schema → 评测数据/评分器 → E0/E0P 基线 → 训练候选数据流水线。`HealthAI-2025` 是 Day 7 数据工程参考，`lm-evaluation-harness` 是 Day 5–6 评测协议参考。
+
+## 后续总计划｜Day 3–16 高效详细版
+
+用户已完成 Day 1–3。Day 4–7 按上方统一版执行；完成后，再从 [Day 3–16 高效详细执行计划](MedicalGPT_Day3-Day16_高效详细执行计划.md) 的 Day 8 继续。每日约 7 小时，另保留 2–4 个机动日处理审核、GPU 等待和长训练。
 
 保留原来的约50K候选审计、随机/精选各4K SFT、约1K偏好DPO、400结构化+300安全评测、多卡学习、消融、服务和复现。通过合并相关学习、复用脚本及利用训练等待时间压缩日程，不减少审核要求，也不承诺训练必定当天结束。
 
-**日程优先级：Day 3–16 高效详细版 > 下方 Day 3–24 扩展版 > 前次修订记录 > 原十天学习材料。** 下方版本均保留，作为背景与延期展开参考；不需要重复执行。仅最新日程的时间安排生效，DPO仍为必做实验。
+**日程优先级：Day 4–7 统一版 > Day 3–16 高效版的 Day 8 及以后 > 下方历史扩展版。** 本文后面的旧 Day 4 仍保留作为数据筛选知识参考，但不再作为独立日程执行；其有效内容已合并到统一版 Day 7。DPO 仍为必做实验。
 
 ## 保留的扩展版｜从 Day 3 继续，延长至 Day 24（保留完整 SFT → DPO 主线）
 
-> **进度确认：用户只完成了 Day 1–2；以下 Day 3–24 均为待办，不代表已完成。**
+> **历史快照：本节是当时“只完成 Day 1–2”时制定的 Day 3–24 扩展版，现在仅作背景和延期参考，不再按其编号重复执行。**
 > 本节按用户最新要求补充：不删除原十天计划，不取消 DPO，不以缩减工作量代替合理排期。前一版“DPO 条件选做”“新的十个工作日”及其精简数据规模保留作历史方案，不再作为当前执行要求。
 > 阅读优先级：本节每日安排 → 下方修订版的方法与评测规范 → 原十天计划的详细源码学习材料。发生范围、数据规模或日期冲突时以本节为准。
 
@@ -1187,8 +1195,8 @@ artifacts/e0_base/smoke_predictions.jsonl
 CUDA_VISIBLE_DEVICES=0 torchrun --nproc_per_node 1 \
   training/supervised_finetuning.py \
   --model_name_or_path Qwen/Qwen3.5-0.8B \
-  --train_file_dir ./project/medguard/data/smoke/train \
-  --validation_file_dir ./project/medguard/data/smoke/dev \
+  --train_file_dir ./project/medaegis/data/smoke/train \
+  --validation_file_dir ./project/medaegis/data/smoke/dev \
   --per_device_train_batch_size 1 \
   --per_device_eval_batch_size 1 \
   --do_train --do_eval \
@@ -1218,7 +1226,7 @@ CUDA_VISIBLE_DEVICES=0 torchrun --nproc_per_node 1 \
 
 ```bash
 python tools/validate_jsonl.py \
-  --file_path ./project/medguard/data/smoke/train/train.jsonl
+  --file_path ./project/medaegis/data/smoke/train/train.jsonl
 ```
 
 ## 17:30–18:00：检查结果
@@ -1344,7 +1352,7 @@ python -m pip install pandas pyarrow datasketch \
 当天新建并点击：
 
 ```text
-project/medguard/data_pipeline/
+project/medaegis/data_pipeline/
 ├── 01_profile_raw_data.py
 ├── 02_clean_and_deduplicate.py
 ├── 03_build_target_profile.py
@@ -1494,9 +1502,9 @@ project/medguard/data_pipeline/
 当天新建：
 
 ```text
-project/medguard/schemas/clinical_analysis.schema.json
-project/medguard/prompts/teacher_prompt_v1.md
-project/medguard/prompts/system_prompt_v1.md
+project/medaegis/schemas/clinical_analysis.schema.json
+project/medaegis/prompts/teacher_prompt_v1.md
+project/medaegis/prompts/system_prompt_v1.md
 ```
 
 先固定输入病例 Schema，避免后续脚本分别发明不同字段：
@@ -1544,7 +1552,7 @@ project/medguard/prompts/system_prompt_v1.md
 当天新建：
 
 ```text
-project/medguard/data_generation/
+project/medaegis/data_generation/
 ├── generate_structured_sft.py
 ├── validate_structured_output.py
 ├── retry_failed_requests.py
@@ -1625,8 +1633,8 @@ validation_errors
 当天新建：
 
 ```text
-project/medguard/preference/build_medical_preferences.py
-project/medguard/preference/validate_preference_pairs.py
+project/medaegis/preference/build_medical_preferences.py
+project/medaegis/preference/validate_preference_pairs.py
 ```
 
 偏好类型和建议数量：
@@ -1753,7 +1761,7 @@ PY
 当天新建：
 
 ```text
-project/medguard/configs/
+project/medaegis/configs/
 ├── sft_random_4k.yaml
 ├── sft_curated_4k.yaml
 └── experiment_manifest.json
@@ -1962,7 +1970,7 @@ lm_eval --model hf \
 当天新建：
 
 ```text
-project/medguard/evaluation/
+project/medaegis/evaluation/
 ├── generate_predictions.py
 ├── validate_json_outputs.py
 ├── clinical_metrics.py
@@ -2389,7 +2397,7 @@ python tools/merge_peft_adapter.py \
 当天计划新建：
 
 ```text
-project/medguard/service/
+project/medaegis/service/
 ├── app.py
 ├── schemas.py
 ├── model_backend.py
@@ -2806,7 +2814,7 @@ git show medguard-v1.0 --stat
 后续执行时，把自己的工作放在独立目录，避免与上游样例混合：
 
 ```text
-project/medguard/
+project/medaegis/
 ├── configs/
 ├── data/
 │   ├── raw_manifest/
